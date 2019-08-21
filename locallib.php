@@ -147,7 +147,6 @@ class assign_submission_signing extends assign_submission_plugin {
             $signingsubmission = $this->get_signing_submission($submission->id);
             if ($signingsubmission) {
                 $data->signing = $signingsubmission->signing;
-                $data->signingformat = $signingsubmission->onlineformat;
             }
 
         }
@@ -161,11 +160,11 @@ class assign_submission_signing extends assign_submission_plugin {
 
        
         
-        $mform->addElement('textarea', 'signing','Data/Base64', 'wrap="virtual" rows="20" cols="50"');
+        $mform->addElement('hidden', 'signing','Data/Base64', 'wrap="virtual" rows="1" cols="1"');
+        $mform->setType('signing', PARAM_RAW);
 
 
-
-        $mform->addElement('html',"<div class='form-group row'><div class='col-md-3'>Unterschrift</div><div class='col-md-9'><canvas id='canvas' class='form-control' height='250px' width='1000px'>test</canvas><a class='btn btn-secondary' id='clearCanvas'  role='button'>Reset</a><a class='btn btn-secondary' id='downloadCanvas'  role='button'>Download</a></div></div>");
+        $mform->addElement('html',"<div class='form-group row'><div class='col-md-3'>Unterschrift</div><div class='col-md-9'><canvas id='canvas' class='form-control' height='250px' width='1000px'></canvas><a class='btn btn-secondary' id='clearCanvas'  role='button'>Reset</a></div></div>");
       //  $mform->addElement('filepicker', 'userfile', get_string('file'), null,
                  //  array('maxbytes' => $maxbytes, 'accepted_types' => '*'));
         $PAGE->requires->js_call_amd('assignsubmission_signing/signingjs', 'save');
@@ -221,7 +220,7 @@ class assign_submission_signing extends assign_submission_plugin {
             'other' => array(
                 'pathnamehashes' => array_keys($files),
                 'content' => $data->signing,
-                'format' => '1',
+                'format' => PARAM_RAW,
             )
         );
         if (!empty($submission->userid) && ($submission->userid != $USER->id)) {
@@ -232,16 +231,17 @@ class assign_submission_signing extends assign_submission_plugin {
         }
         $event = \assignsubmission_signing\event\assessable_uploaded::create($params);
         $event->trigger();
-
+        
         $groupname = null;
         $groupid = 0;
+        /*
         // Get the group name as other fields are not transcribed in the logs and this information is important.
         if (empty($submission->userid) && !empty($submission->groupid)) {
             $groupname = $DB->get_field('groups', 'name', array('id' => $submission->groupid), MUST_EXIST);
             $groupid = $submission->groupid;
         } else {
             $params['relateduserid'] = $submisson->userid;
-        }
+        }*/
 
         $count = count_words($data->signing);
 
@@ -253,8 +253,6 @@ class assign_submission_signing extends assign_submission_plugin {
             'submissionattempt' => $submission->attemptnumber,
             'submissionstatus' => $submission->status,
             'signingwordcount' => $count,
-            'groupid' => $groupid,
-            'groupname' => $groupname
         );
 
 
@@ -343,7 +341,7 @@ class assign_submission_signing extends assign_submission_plugin {
 
         $signingsubmission = $this->get_signing_submission($submission->id);
         // Always show the view link.
-        $showviewlink = true;
+        $showviewlink = false;
 
         if ($signingsubmission) {
             // This contains the shortened version of the text plus an optional 'Export to portfolio' button.
@@ -355,19 +353,10 @@ class assign_submission_signing extends assign_submission_plugin {
 
             // The actual submission text.
             $signing = trim($signingsubmission->signing);
-            // The shortened version of the submission text.
-            $shorttext = shorten_text($signing, 140);
+            $text = "<img src='".strip_tags($signing)."'>";
 
-
-        
-            // We compare the actual text submission and the shortened version. If they are not equal, we show the word count.
-            if ($signing != $shorttext) {
-                $wordcount = get_string('numwords', 'assignsubmission_signing', count_words($signing));
-
-                return $plagiarismlinks . $wordcount . $text;
-            } else {
-                return $plagiarismlinks . $text;
-            }
+            return  $text;
+            
         }
         return '';
     }

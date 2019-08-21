@@ -164,10 +164,6 @@ function downloadCanvas(canvas){
 }
 
 function save(){
-	    alert("Hello! I am an alert box!!");
 		this.href = canvas.toDataURL();
-		$('#signing_text').val("this.href");
-		console.log("asdasd");
-
-
+		$('#signing').val("this.href");
 }

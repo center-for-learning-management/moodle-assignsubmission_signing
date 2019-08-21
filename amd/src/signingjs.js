@@ -25,6 +25,13 @@ function initialize() {
         canvas.width = rect.width;
         canvas.height = rect.height;
     mousePressed = false; 
+    $('#clearCanvas').bind('click', function() {
+      clearCanvas(canvas,ctx);
+     });
+    $('#id_submitbutton').click(function() {
+       var data = $('#canvas')[0].toDataURL();// Change here
+        $('[name="signing"]').val(data);
+      });
     $('#canvas').mousedown(function (e) {
         mousePressed = true;
         Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, false);
@@ -74,8 +81,16 @@ function Draw(x, y, isDown) {
     lastX = x; lastY = y;
 }
   
-function clearArea() {
-    // Use the identity matrix while clearing the canvas
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+function clearCanvas(canvas,ctx) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function downloadCanvas(canvas){
+  this.href = canvas.toDataURL();
+
+}
+
+function save(){
+    this.href = canvas.toDataURL();
+    $('#signing_text').val("this.href");
 }
