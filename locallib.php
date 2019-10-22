@@ -35,13 +35,15 @@ define('ASSIGNSUBMISSION_SIGNING_FILEAREA', 'submissions_signing');
  * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class assign_submission_signing extends assign_submission_plugin {
+class assign_submission_signing extends assign_submission_plugin
+{
 
     /**
      * Get the name of the online text submission plugin
      * @return string
      */
-    public function get_name() {
+    public function get_name()
+    {
         return get_string('signing', 'assignsubmission_signing');
     }
 
@@ -52,7 +54,8 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param  int $submissionid
      * @return mixed
      */
-    private function get_signing_submission($submissionid) {
+    private function get_signing_submission($submissionid)
+    {
         global $DB;
 
         return $DB->get_record('assignsubmission_signing', array('submission'=>$submissionid));
@@ -64,7 +67,8 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param MoodleQuickForm $mform The form to add elements to
      * @return void
      */
-    public function get_settings(MoodleQuickForm $mform) {
+    public function get_settings(MoodleQuickForm $mform)
+    {
         global $CFG, $COURSE;
 
         $defaultwordlimit = $this->get_config('wordlimit') == 0 ? '' : $this->get_config('wordlimit');
@@ -76,15 +80,23 @@ class assign_submission_signing extends assign_submission_plugin {
         // Create a text box that can be enabled/disabled for signing word limit.
         $wordlimitgrp = array();
         $wordlimitgrp[] = $mform->createElement('text', 'assignsubmission_signing_wordlimit', '', $options);
-        $wordlimitgrp[] = $mform->createElement('checkbox', 'assignsubmission_signing_wordlimit_enabled',
-                '', get_string('enable'));
+        $wordlimitgrp[] = $mform->createElement(
+            'checkbox',
+            'assignsubmission_signing_wordlimit_enabled',
+            '',
+            get_string('enable')
+        );
         $mform->addGroup($wordlimitgrp, 'assignsubmission_signing_wordlimit_group', $name, ' ', false);
-        $mform->addHelpButton('assignsubmission_signing_wordlimit_group',
-                              'wordlimit',
-                              'assignsubmission_signing');
-        $mform->disabledIf('assignsubmission_signing_wordlimit',
-                           'assignsubmission_signing_wordlimit_enabled',
-                           'notchecked');
+        $mform->addHelpButton(
+            'assignsubmission_signing_wordlimit_group',
+            'wordlimit',
+            'assignsubmission_signing'
+        );
+        $mform->disabledIf(
+            'assignsubmission_signing_wordlimit',
+            'assignsubmission_signing_wordlimit_enabled',
+            'notchecked'
+        );
 
         // Add numeric rule to text field.
         $wordlimitgrprules = array();
@@ -95,9 +107,11 @@ class assign_submission_signing extends assign_submission_plugin {
         $mform->setDefault('assignsubmission_signing_wordlimit', $defaultwordlimit);
         $mform->setDefault('assignsubmission_signing_wordlimit_enabled', $defaultwordlimitenabled);
         $mform->setType('assignsubmission_signing_wordlimit', PARAM_INT);
-        $mform->disabledIf('assignsubmission_signing_wordlimit_group',
-                           'assignsubmission_signing_enabled',
-                           'notchecked'); 
+        $mform->disabledIf(
+            'assignsubmission_signing_wordlimit_group',
+            'assignsubmission_signing_enabled',
+            'notchecked'
+        );
     }
 
     /**
@@ -106,7 +120,8 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param stdClass $data
      * @return bool
      */
-    public function save_settings(stdClass $data) {
+    public function save_settings(stdClass $data)
+    {
         if (empty($data->assignsubmission_signing_wordlimit) || empty($data->assignsubmission_signing_wordlimit_enabled)) {
             $wordlimit = 0;
             $wordlimitenabled = 0;
@@ -129,7 +144,8 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param stdClass $data
      * @return true if elements were added to the form
      */
-    public function get_form_elements($submission, MoodleQuickForm $mform, stdClass $data) {
+    public function get_form_elements($submission, MoodleQuickForm $mform, stdClass $data)
+    {
         global $PAGE;
         $elements = array();
 
@@ -148,23 +164,24 @@ class assign_submission_signing extends assign_submission_plugin {
             if ($signingsubmission) {
                 $data->signing = $signingsubmission->signing;
             }
-
         }
-        $data = file_prepare_standard_editor($data,
-                                             'signing',
-                                             $editoroptions,
-                                             $this->assignment->get_context(),
-                                             'assignsubmission_onlinetext',
-                                             ASSIGNSUBMISSION_ONLINETEXT_FILEAREA,
-                                             $submissionid);
+        $data = file_prepare_standard_editor(
+            $data,
+            'signing',
+            $editoroptions,
+            $this->assignment->get_context(),
+            'assignsubmission_onlinetext',
+            ASSIGNSUBMISSION_ONLINETEXT_FILEAREA,
+            $submissionid
+        );
 
        
         
-        $mform->addElement('hidden', 'signing','Data/Base64', 'wrap="virtual" rows="1" cols="1"');
+        $mform->addElement('hidden', 'signing', 'Data/Base64', 'wrap="virtual" rows="1" cols="1"');
         $mform->setType('signing', PARAM_RAW);
 
 
-        $mform->addElement('html',"<div class='form-group row'><div class='col-md-3'>Unterschrift</div><div class='col-md-9'><canvas id='canvas' class='form-control' height='250px' width='1000px'></canvas><a class='btn btn-secondary' id='clearCanvas'  role='button'>Reset</a></div></div>");
+        $mform->addElement('html', "<div class='form-group row'><div class='col-md-3'>Unterschrift</div><div class='col-md-9'><canvas id='canvas' class='form-control' height='250px' width='1000px'></canvas><a class='btn btn-secondary' id='clearCanvas'  role='button'>Reset</a></div></div>");
       //  $mform->addElement('filepicker', 'userfile', get_string('file'), null,
                  //  array('maxbytes' => $maxbytes, 'accepted_types' => '*'));
         $PAGE->requires->js_call_amd('assignsubmission_signing/signingjs', 'save');
@@ -178,7 +195,8 @@ class assign_submission_signing extends assign_submission_plugin {
      *
      * @return array
      */
-    private function get_edit_options() {
+    private function get_edit_options()
+    {
         $editoroptions = array(
             'noclean' => false,
             'maxfiles' => EDITOR_UNLIMITED_FILES,
@@ -198,19 +216,22 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param stdClass $data
      * @return bool
      */
-    public function save(stdClass $submission, stdClass $data) {
+    public function save(stdClass $submission, stdClass $data)
+    {
         global $USER, $DB;
         $editoroptions = $this->get_edit_options();
         $signingsubmission = $this->get_signing_submission($submission->id);
 
         $fs = get_file_storage();
 
-        $files = $fs->get_area_files($this->assignment->get_context()->id,
-                                     'assignsubmission_signing',
-                                     ASSIGNSUBMISSION_SIGNING_FILEAREA,
-                                     $submission->id,
-                                     'id',
-                                     false);
+        $files = $fs->get_area_files(
+            $this->assignment->get_context()->id,
+            'assignsubmission_signing',
+            ASSIGNSUBMISSION_SIGNING_FILEAREA,
+            $submission->id,
+            'id',
+            false
+        );
 
 
         $params = array(
@@ -234,14 +255,14 @@ class assign_submission_signing extends assign_submission_plugin {
         
         $groupname = null;
         $groupid = 0;
-        /*
+        
         // Get the group name as other fields are not transcribed in the logs and this information is important.
         if (empty($submission->userid) && !empty($submission->groupid)) {
             $groupname = $DB->get_field('groups', 'name', array('id' => $submission->groupid), MUST_EXIST);
             $groupid = $submission->groupid;
         } else {
-            $params['relateduserid'] = $submisson->userid;
-        }*/
+            $params['relateduserid'] = $submission->userid;
+        }
 
         $count = count_words($data->signing);
 
@@ -258,7 +279,6 @@ class assign_submission_signing extends assign_submission_plugin {
 
 
         if ($signingsubmission) {
-
             $signingsubmission->signing = $data->signing;
             $signingsubmission->onlineformat = 1;
             $params['objectid'] = $signingsubmission->id;
@@ -268,7 +288,6 @@ class assign_submission_signing extends assign_submission_plugin {
             $event->trigger();
             return $updatestatus;
         } else {
-
             $signingsubmission = new stdClass();
             $signingsubmission->signing = $data->signing;
             $signingsubmission->onlineformat = 1;
@@ -288,7 +307,8 @@ class assign_submission_signing extends assign_submission_plugin {
      *
      * @return array An array of field names and descriptions. (name=>description, ...)
      */
-    public function get_editor_fields() {
+    public function get_editor_fields()
+    {
         return array('signing' => get_string('pluginname', 'assignsubmission_signing'));
     }
 
@@ -299,7 +319,8 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param int $submissionid
      * @return string
      */
-    public function get_editor_text($name, $submissionid) {
+    public function get_editor_text($name, $submissionid)
+    {
         if ($name == 'signing') {
             $signingsubmission = $this->get_signing_submission($submissionid);
             if ($signingsubmission) {
@@ -317,7 +338,8 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param int $submissionid
      * @return int
      */
-    public function get_editor_format($name, $submissionid) {
+    public function get_editor_format($name, $submissionid)
+    {
         if ($name == 'signing') {
             $signingsubmission = $this->get_signing_submission($submissionid);
             if ($signingsubmission) {
@@ -336,7 +358,8 @@ class assign_submission_signing extends assign_submission_plugin {
       * @param bool $showviewlink - If the summary has been truncated set this to true
       * @return string
       */
-    public function view_summary(stdClass $submission, & $showviewlink) {
+    public function view_summary(stdClass $submission, & $showviewlink)
+    {
         global $CFG;
 
         $signingsubmission = $this->get_signing_submission($submission->id);
@@ -345,18 +368,20 @@ class assign_submission_signing extends assign_submission_plugin {
 
         if ($signingsubmission) {
             // This contains the shortened version of the text plus an optional 'Export to portfolio' button.
-            $text = $this->assignment->render_editor_content(ASSIGNSUBMISSION_SIGNING_FILEAREA,
-                                                             $signingsubmission->submission,
-                                                             $this->get_type(),
-                                                             'signing',
-                                                             'assignsubmission_signing', true);
+            $text = $this->assignment->render_editor_content(
+                ASSIGNSUBMISSION_SIGNING_FILEAREA,
+                $signingsubmission->submission,
+                $this->get_type(),
+                'signing',
+                'assignsubmission_signing',
+                true
+            );
 
             // The actual submission text.
             $signing = trim($signingsubmission->signing);
             $text = "<img src='".strip_tags($signing)."'>";
 
             return  $text;
-            
         }
         return '';
     }
@@ -368,7 +393,8 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param stdClass $user - This is the user record for this submission
      * @return array - return an array of files indexed by filename
      */
-    public function get_files(stdClass $submission, stdClass $user) {
+    public function get_files(stdClass $submission, stdClass $user)
+    {
         global $DB;
 
         $files = array();
@@ -388,12 +414,14 @@ class assign_submission_signing extends assign_submission_plugin {
 
             $fs = get_file_storage();
 
-            $fsfiles = $fs->get_area_files($this->assignment->get_context()->id,
-                                           'assignsubmission_signing',
-                                           ASSIGNSUBMISSION_SIGNING_FILEAREA,
-                                           $submission->id,
-                                           'timemodified',
-                                           false);
+            $fsfiles = $fs->get_area_files(
+                $this->assignment->get_context()->id,
+                'assignsubmission_signing',
+                ASSIGNSUBMISSION_SIGNING_FILEAREA,
+                $submission->id,
+                'timemodified',
+                false
+            );
 
             foreach ($fsfiles as $file) {
                 $files[$file->get_filename()] = $file;
@@ -409,20 +437,22 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param stdClass $submission
      * @return string
      */
-    public function view(stdClass $submission) {
+    public function view(stdClass $submission)
+    {
         global $CFG;
         $result = '';
 
         $signingsubmission = $this->get_signing_submission($submission->id);
 
         if ($signingsubmission) {
-
             // Render for portfolio API.
-            $result .= $this->assignment->render_editor_content(ASSIGNSUBMISSION_SIGNING_FILEAREA,
-                                                                $signingsubmission->submission,
-                                                                $this->get_type(),
-                                                                'signing',
-                                                                'assignsubmission_signing');
+            $result .= $this->assignment->render_editor_content(
+                ASSIGNSUBMISSION_SIGNING_FILEAREA,
+                $signingsubmission->submission,
+                $this->get_type(),
+                'signing',
+                'assignsubmission_signing'
+            );
 
             $result = "<img src='".strip_tags($result)."'>";
         }
@@ -437,7 +467,8 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param int $version old assignment version
      * @return bool True if upgrade is possible
      */
-    public function can_upgrade($type, $version) {
+    public function can_upgrade($type, $version)
+    {
         if ($type == 'online' && $version >= 2011112900) {
             return true;
         }
@@ -453,7 +484,8 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param string $log record log events here
      * @return bool Was it a success?
      */
-    public function upgrade_settings(context $oldcontext, stdClass $oldassignment, & $log) {
+    public function upgrade_settings(context $oldcontext, stdClass $oldassignment, & $log)
+    {
         // No settings to upgrade.
         return true;
     }
@@ -468,11 +500,13 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param string $log Record upgrade messages in the log
      * @return bool true or false - false will trigger a rollback
      */
-    public function upgrade(context $oldcontext,
-                            stdClass $oldassignment,
-                            stdClass $oldsubmission,
-                            stdClass $submission,
-                            & $log) {
+    public function upgrade(
+        context $oldcontext,
+        stdClass $oldassignment,
+        stdClass $oldsubmission,
+        stdClass $submission,
+        & $log
+    ) {
         global $DB;
 
         $signingsubmission = new stdClass();
@@ -496,14 +530,16 @@ class assign_submission_signing extends assign_submission_plugin {
         }
 
         // Now copy the area files.
-        $this->assignment->copy_area_files_for_upgrade($oldcontext->id,
-                                                        'mod_assignment',
-                                                        'submission',
-                                                        $oldsubmission->id,
-                                                        $this->assignment->get_context()->id,
-                                                        'assignsubmission_signing',
-                                                        ASSIGNSUBMISSION_SIGNING_FILEAREA,
-                                                        $submission->id);
+        $this->assignment->copy_area_files_for_upgrade(
+            $oldcontext->id,
+            'mod_assignment',
+            'submission',
+            $oldsubmission->id,
+            $this->assignment->get_context()->id,
+            'assignsubmission_signing',
+            ASSIGNSUBMISSION_SIGNING_FILEAREA,
+            $submission->id
+        );
         return true;
     }
 
@@ -513,13 +549,16 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param stdClass $submission The new submission
      * @return string
      */
-    public function format_for_log(stdClass $submission) {
+    public function format_for_log(stdClass $submission)
+    {
         // Format the info for each submission plugin (will be logged).
         $signingsubmission = $this->get_signing_submission($submission->id);
         $signingloginfo = '';
-        $signingloginfo .= get_string('numwordsforlog',
-                                         'assignsubmission_signing',
-                                         count_words($signingsubmission->signing));
+        $signingloginfo .= get_string(
+            'numwordsforlog',
+            'assignsubmission_signing',
+            count_words($signingsubmission->signing)
+        );
 
         return $signingloginfo;
     }
@@ -529,10 +568,13 @@ class assign_submission_signing extends assign_submission_plugin {
      *
      * @return bool
      */
-    public function delete_instance() {
+    public function delete_instance()
+    {
         global $DB;
-        $DB->delete_records('assignsubmission_signing',
-                            array('assignment'=>$this->assignment->get_instance()->id));
+        $DB->delete_records(
+            'assignsubmission_signing',
+            array('assignment'=>$this->assignment->get_instance()->id)
+        );
 
         return true;
     }
@@ -543,7 +585,8 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param stdClass $submission
      * @return bool
      */
-    public function is_empty(stdClass $submission) {
+    public function is_empty(stdClass $submission)
+    {
         $signingsubmission = $this->get_signing_submission($submission->id);
         $wordcount = 0;
         $hasinsertedresources = false;
@@ -566,7 +609,8 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param stdClass $data The submission data
      * @return bool
      */
-    public function submission_is_empty(stdClass $data) {
+    public function submission_is_empty(stdClass $data)
+    {
         if (!isset($data->signing)) {
             return false;
         }
@@ -577,8 +621,10 @@ class assign_submission_signing extends assign_submission_plugin {
             $wordcount = count_words(trim((string)$data->signing_editor['text']));
             // Check if the online text submission contains video, audio or image elements
             // that can be ignored and stripped by count_words().
-            $hasinsertedresources = preg_match('/<\s*((video|audio)[^>]*>(.*?)<\s*\/\s*(video|audio)>)|(img[^>]*>(.*?))/',
-                    trim((string)$data->signing_editor['text']));
+            $hasinsertedresources = preg_match(
+                '/<\s*((video|audio)[^>]*>(.*?)<\s*\/\s*(video|audio)>)|(img[^>]*>(.*?))/',
+                trim((string)$data->signing_editor['text'])
+            );
         }
 
         //return $wordcount == 0 && !$hasinsertedresources;
@@ -589,7 +635,8 @@ class assign_submission_signing extends assign_submission_plugin {
      * Get file areas returns a list of areas this plugin stores files
      * @return array - An array of fileareas (keys) and descriptions (values)
      */
-    public function get_file_areas() {
+    public function get_file_areas()
+    {
         return array(ASSIGNSUBMISSION_SIGNING_FILEAREA=>$this->get_name());
     }
 
@@ -599,14 +646,21 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param stdClass $sourcesubmission
      * @param stdClass $destsubmission
      */
-    public function copy_submission(stdClass $sourcesubmission, stdClass $destsubmission) {
+    public function copy_submission(stdClass $sourcesubmission, stdClass $destsubmission)
+    {
         global $DB;
 
         // Copy the files across (attached via the text editor).
         $contextid = $this->assignment->get_context()->id;
         $fs = get_file_storage();
-        $files = $fs->get_area_files($contextid, 'assignsubmission_signing',
-                                     ASSIGNSUBMISSION_SIGNING_FILEAREA, $sourcesubmission->id, 'id', false);
+        $files = $fs->get_area_files(
+            $contextid,
+            'assignsubmission_signing',
+            ASSIGNSUBMISSION_SIGNING_FILEAREA,
+            $sourcesubmission->id,
+            'id',
+            false
+        );
         foreach ($files as $file) {
             $fieldupdates = array('itemid' => $destsubmission->id);
             $fs->create_file_from_storedfile($fieldupdates, $file);
@@ -627,7 +681,8 @@ class assign_submission_signing extends assign_submission_plugin {
      *
      * @return external_description|null
      */
-    public function get_external_parameters() {
+    public function get_external_parameters()
+    {
         $editorparams = array('text' => new external_value(PARAM_RAW, 'The text for this submission.'),
                               'format' => new external_value(PARAM_INT, 'The format for this submission'),
                               'itemid' => new external_value(PARAM_INT, 'The draft area id for files attached to the submission'));
@@ -641,7 +696,8 @@ class assign_submission_signing extends assign_submission_plugin {
      * @param string $submissiontext signing submission text from editor
      * @return string Error message if limit is enabled and exceeded, otherwise null
      */
-    public function check_word_count($submissiontext) {
+    public function check_word_count($submissiontext)
+    {
         global $OUTPUT;
 
         $wordlimitenabled = $this->get_config('wordlimitenabled');
@@ -656,8 +712,11 @@ class assign_submission_signing extends assign_submission_plugin {
         if ($wordcount <= $wordlimit) {
             return null;
         } else {
-            $errormsg = get_string('wordlimitexceeded', 'assignsubmission_signing',
-                    array('limit' => $wordlimit, 'count' => $wordcount));
+            $errormsg = get_string(
+                'wordlimitexceeded',
+                'assignsubmission_signing',
+                array('limit' => $wordlimit, 'count' => $wordcount)
+            );
             return $OUTPUT->error_text($errormsg);
         }
     }
@@ -668,9 +727,8 @@ class assign_submission_signing extends assign_submission_plugin {
      * @return array the list of settings
      * @since Moodle 3.2
      */
-    public function get_config_for_external() {
+    public function get_config_for_external()
+    {
         return (array) $this->get_config();
     }
 }
-
-
