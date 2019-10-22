@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace assignsubmission_onlinetext\privacy;
+namespace assignsubmission_signing\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -165,11 +165,11 @@ class provider implements
 
         // Delete related files.
         $fs = get_file_storage();
-        $fs->delete_area_files($deletedata->get_context()->id, 'assignsubmission_onlinetext', ASSIGNSUBMISSION_ONLINETEXT_FILEAREA,
+        $fs->delete_area_files($deletedata->get_context()->id, 'assignsubmission_signing', ASSIGNSUBMISSION_SIGNING_FILEAREA,
                 $submissionid);
 
         // Delete the records in the table.
-        $DB->delete_records('assignsubmission_onlinetext', ['assignment' => $deletedata->get_assignid(),
+        $DB->delete_records('assignsubmission_signing', ['assignment' => $deletedata->get_assignid(),
                 'submission' => $submissionid]);
     }
 
@@ -193,9 +193,9 @@ class provider implements
         $fs = get_file_storage();
         list($sql, $params) = $DB->get_in_or_equal($deletedata->get_submissionids(), SQL_PARAMS_NAMED);
         $fs->delete_area_files_select($deletedata->get_context()->id,
-                'assignsubmission_onlinetext', ASSIGNSUBMISSION_ONLINETEXT_FILEAREA, $sql, $params);
+                'assignsubmission_signing', ASSIGNSUBMISSION_SIGNING_FILEAREA, $sql, $params);
 
         $params['assignid'] = $deletedata->get_assignid();
-        $DB->delete_records_select('assignsubmission_onlinetext', "assignment = :assignid AND submission $sql", $params);
+        $DB->delete_records_select('assignsubmission_signing', "assignment = :assignid AND submission $sql", $params);
     }
 }
