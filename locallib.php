@@ -181,7 +181,8 @@ class assign_submission_signing extends assign_submission_plugin
         $mform->setType('signing', PARAM_RAW);
 
 
-        $mform->addElement('html', "<div class='form-group row'><div class='col-md-3'>Unterschrift</div><div class='col-md-9'><canvas id='canvas' class='form-control' height='250px' width='1000px'></canvas><a class='btn btn-secondary' id='clearCanvas'  role='button'>Reset</a></div></div>");
+        $mform->addElement('html', "<div class='form-group row'><div class='col-md-3'>Unterschrift</div><div class='col-md-9'><canvas id='canvas' class='form-control' height='250px' width='1000px'></canvas>
+            <a class='btn btn-secondary' id='clearCanvas'  role='button'>Reset</a></div></div>");
       //  $mform->addElement('filepicker', 'userfile', get_string('file'), null,
                  //  array('maxbytes' => $maxbytes, 'accepted_types' => '*'));
         $PAGE->requires->js_call_amd('assignsubmission_signing/signingjs', 'save');

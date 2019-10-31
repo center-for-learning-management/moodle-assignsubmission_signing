@@ -18,7 +18,7 @@ define(['jquery'], function ($) {
 
 function initialize() {
 
-var canvas = document.getElementById('canvas'),
+    canvas = document.getElementById('canvas');
     ctx = canvas.getContext('2d');
 var rect = canvas.getBoundingClientRect();
     canvas.width = rect.width;
@@ -116,11 +116,13 @@ function renderCanvas() {
 })();
 
 $(window).resize(function () {
-    var dataURL = canvas.toDataURL();
-    console.log(dataURL);
+    var W = canvas.width, H = canvas.height;
+    var temp = ctx.getImageData(0,0,W,H);
     var rect = canvas.getBoundingClientRect();
     canvas.width = rect.width;
     canvas.height = rect.height;
+     W = canvas.width, H = canvas.height
+    ctx.putImageData(temp,0,0);
 });
 
 
@@ -137,9 +139,13 @@ function downloadCanvas(canvas) {
 
 function save() {
     this.href = canvas.toDataURL();
-    if(isCanvasBlank(canvas)){
-      console.log("true");
+    
+    if(this.href == document.getElementById('blank').toDataURL()){
+
+    $('#signing_text').val("");
     }
+    else{
     $('#signing_text').val("this.href");
+    }
 }
 }
